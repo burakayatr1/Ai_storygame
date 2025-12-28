@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Grok Macera Oyunu</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background-color: #f0f2f5; }
+        #oyun-kutusu { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 80%; max-width: 600px; text-align: center; }
+        #hikaye-metni { margin: 20px 0; min-height: 100px; line-height: 1.6; font-size: 1.1em; color: #333; }
+        .butonlar { display: flex; gap: 10px; justify-content: center; }
+        button { padding: 10px 25px; font-size: 1em; cursor: pointer; border: none; border-radius: 5px; background-color: #007bff; color: white; transition: background 0.3s; }
+        button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+
+    <div id="oyun-kutusu">
+        <h1>Macera Oyunu</h1>
+        <hr>
+        <div id="hikaye-metni">Grok Macera Dünyasına Hoş Geldin! Sabah uyandın ve dışarı çıktın... Sola git(0)/Sağa git (1)</div>
+        
+        <div class="butonlar">
+            <button onclick="hamleYap('0')">(0)</button>
+            <button onclick="hamleYap('1')">(1)</button>
+        </div>
+    </div>
+
+    <script>
+        async function hamleYap(secim) {
+            const metinAlani = document.getElementById('hikaye-metni');
+            
+            // Görsel geri bildirim için yazı rengini soluklaştır
+            metinAlani.style.opacity = "0.5";
+
+            try {
+                // Senin yazdığın POST /story endpoint'ine istek atıyoruz
+                // Not: Query parametresi olarak gönderiyoruz: /story?input=0
+                const response = await fetch(`/story?input=${secim}`, {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+                
+                // Gelen cevabı ekrana yazdır (Eğer JSON olarak obje dönüyorsan data.grok gibi kullanmalısın)
+                metinAlani.innerText = typeof data === 'string' ? data : (data.grok || JSON.stringify(data));
+            } catch (error) {
+                metinAlani.innerText = "Bir hata oluştu: " + error;
+            } finally {
+                metinAlani.style.opacity = "1";
+            }
+        }
+    </script>
+</body>
+</html>
